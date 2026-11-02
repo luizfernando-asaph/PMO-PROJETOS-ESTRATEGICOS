@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Envio de tarefas por área · Meireles e Freitas PMO</title>
+<style>
+  :root {
+    --bg:#0F2921; --bg2:#16352B; --panel:#1B4136; --panel2:#20493C; --border:#2C5A4B;
+    --text:#F4F1E8; --muted:#A9C4B7; --cream:#EEE9DC;
+    --lime:#8BC34A; --green:#22C55E; --teal:#14B8A6; --orange:#EA580C;
+    --indigo:#4338CA; --blue:#2563EB; --amber:#FBBF77; --red:#ff9b9b;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  header.top { position:sticky; top:0; z-index:20; background:rgba(15,41,33,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; padding:12px 24px; flex-wrap:wrap; gap:8px; }
+  header.top .brand { font-weight:800; color:#fff; letter-spacing:.5px; }
+  nav a { color:var(--muted); text-decoration:none; margin-left:16px; font-size:14px; font-weight:600; }
+  nav a:hover { color:var(--lime); }
+  nav a.on { color:var(--amber); }
+  .hero { max-width:1240px; margin:0 auto; padding:34px 24px 10px; }
+  .hero .kicker { color:var(--lime); font-weight:700; letter-spacing:1.5px; font-size:12px; text-transform:uppercase; }
+  .hero h1 { font-size:30px; margin:6px 0; color:#fff; }
+  .hero p { color:var(--muted); margin:0 0 6px; max-width:860px; }
+  main { max-width:1240px; margin:0 auto; padding:0 24px 60px; }
+  section { padding:28px 0; border-top:1px solid var(--border); }
+  h2 { font-size:20px; margin:0 0 4px; color:#fff; }
+  .sub { color:var(--muted); font-size:13.5px; margin:0 0 16px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .spacer { flex:1; }
+  button, .btn { font:inherit; font-size:13.5px; font-weight:600; border-radius:8px; border:1px solid var(--border); background:var(--panel2);
+    color:var(--text); padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  button:hover, .btn:hover { border-color:var(--lime); }
+  button.primary { background:var(--lime); border-color:var(--lime); color:#0F2921; }
+  button.primary:hover { filter:brightness(1.08); }
+  button.ghost { background:transparent; }
+  button.danger { color:var(--red); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  input[type=text], input[type=email], input[type=date], select, textarea {
+    font:inherit; font-size:14px; color:var(--text); background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; width:100%; }
+  textarea { resize:vertical; }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--lime); outline-offset:0; border-color:var(--lime); }
+  label.f { display:block; font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:4px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:14px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  .area { cursor:pointer; position:relative; transition:border-color .15s; }
+  .area:hover { border-color:var(--muted); }
+  .area.sel { border-color:var(--lime); box-shadow:0 0 0 1px var(--lime) inset; }
+  .area h3 { margin:0 0 4px; font-size:16px; color:#fff; padding-right:104px; }
+  .area .mails { font-size:12.5px; color:var(--muted); word-break:break-all; min-height:18px; }
+  .area .mails.vazio { color:var(--amber); }
+  .area .acts { position:absolute; top:10px; right:10px; display:flex; gap:4px; }
+  .area .acts button { padding:3px 8px; font-size:12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0; }
+  .chip { font-size:11.5px; background:var(--bg2); border:1px solid var(--border); color:var(--cream); padding:2px 8px; border-radius:20px; }
+  .nums { display:flex; gap:14px; font-size:12.5px; color:var(--muted); }
+  .nums b { color:#fff; font-size:16px; display:block; }
+  .nums .late b { color:var(--red); }
+  .form { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form .full { grid-column:1/-1; }
+  .grupos { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:6px; }
+  .grupos label { display:flex; gap:8px; align-items:center; font-size:13.5px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; }
+  .grupos label small { color:var(--muted); margin-left:auto; }
+  .hint { font-size:12.5px; color:var(--muted); margin-top:4px; }
+  .warn { color:var(--amber); }
+  .err { color:var(--red); }
+  .callout { border-left:3px solid var(--amber); background:rgba(251,191,119,.08); padding:10px 14px; border-radius:6px; font-size:13.5px; margin-top:14px; }
+  .callout.info { border-color:var(--teal); background:rgba(20,184,166,.08); }
+  .table-wrap { overflow:auto; border-radius:10px; border:1px solid var(--border); max-height:620px; }
+  .table-wrap table { width:100%; border-collapse:collapse; font-size:13px; background:var(--panel); }
+  .table-wrap thead th { position:sticky; top:0; background:var(--panel2); text-align:left; padding:9px 10px; color:var(--muted); font-weight:600; border-bottom:1px solid var(--border); white-space:nowrap; z-index:1; }
+  .table-wrap td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr.proj td { background:var(--bg2); color:var(--lime); font-weight:700; font-size:12.5px; letter-spacing:.3px; }
+  tr.off td:not(:first-child) { opacity:.4; }
+  td.obs { min-width:230px; }
+  td.obs .auto { color:var(--muted); font-size:12px; margin-bottom:4px; }
+  td.obs .auto .late { color:var(--red); font-weight:700; }
+  td.obs .auto .soon { color:var(--amber); font-weight:700; }
+  td.obs input { font-size:12.5px; padding:5px 8px; }
+  .nowrap { white-space:nowrap; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+  .st-ok { background:rgba(34,197,94,.18); color:var(--green); }
+  .st-prog { background:rgba(37,99,235,.22); color:#9dbcff; }
+  .st-todo { background:rgba(169,196,183,.18); color:#c8ded3; }
+  .st-late { background:rgba(239,106,106,.2); color:var(--red); }
+  .preview { background:#fff; color:#1f2937; border-radius:10px; padding:18px; max-height:560px; overflow:auto; }
+  .send { display:grid; grid-template-columns:minmax(300px,380px) 1fr; gap:18px; align-items:start; }
+  .send .opts { display:flex; flex-direction:column; gap:12px; }
+  .send .btns { display:grid; gap:8px; }
+  .send .btns button { flex-direction:column; align-items:flex-start; text-align:left; gap:2px; }
+  .send .btns small { display:block; font-weight:400; color:var(--muted); font-size:11.5px; }
+  .empty { color:var(--muted); padding:30px; text-align:center; }
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--lime); color:#0F2921; font-weight:700; padding:10px 18px; border-radius:10px; z-index:99; display:none; box-shadow:0 6px 24px rgba(0,0,0,.4); }
+  .hist { font-size:12.5px; color:var(--muted); margin-top:10px; }
+  footer { text-align:center; color:var(--muted); font-size:12.5px; padding:30px 24px; border-top:1px solid var(--border); }
+  footer a { color:var(--lime); }
+  @media (max-width:820px){ .form { grid-template-columns:1fr; } .send { grid-template-columns:1fr; } nav a { margin-left:10px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">MEIRELES &amp; FREITAS · PMO</div>
+  <nav>
+    <a href="index.html">← Painel consolidado</a>
+    <a href="index.html#roadmap">Roadmap</a>
+    <a class="on" href="envio-por-area.html">Envio por área</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="kicker">Painel de tarefas por área</div>
+  <h1>Envio de tarefas por área</h1>
+  <p>Cadastre o e-mail de cada área, escolha quais grupos da planilha pertencem a ela e envie só as tarefas daquela área, com projeto, ação, atividade a ser realizada, início, fim, status e observação.</p>
+  <p id="fonteInfo" style="font-size:13px"></p>
+  <div class="row" style="margin-top:10px">
+    <button id="btnImportXlsx" title="Lê a aba BD de uma versão mais nova da planilha">⟳ Atualizar com planilha (.xlsx)</button>
+    <button id="btnVoltarSnapshot" class="ghost" hidden>Voltar aos dados publicados</button>
+    <input type="file" id="fileXlsx" accept=".xlsx,.xlsm,.xls" hidden>
+  </div>
+  <div id="avisosDados"></div>
+</div>
+
+<main>
+
+<!-- 1. Cadastro de áreas -->
+<section id="cadastro">
+  <div class="row">
+    <div>
+      <h2>1. Áreas e e-mails</h2>
+      <p class="sub">Clique numa área para ver o painel dela. Os números contam as tarefas não concluídas.</p>
+    </div>
+    <div class="spacer"></div>
+    <button id="btnNovaArea" class="primary">+ Nova área</button>
+    <button id="btnExportCad" class="ghost" title="Salva áreas, e-mails e observações num arquivo .json">Exportar cadastro</button>
+    <button id="btnImportCad" class="ghost">Importar cadastro</button>
+    <input type="file" id="fileCad" accept=".json" hidden>
+  </div>
+
+  <div id="formArea" class="card" hidden style="margin-bottom:16px">
+    <h3 id="formTitulo" style="margin:0 0 12px;color:#fff">Nova área</h3>
+    <div class="form">
+      <div>
+        <label class="f" for="fNome">Nome da área *</label>
+        <input type="text" id="fNome" placeholder="Ex.: Departamento Pessoal">
+      </div>
+      <div>
+        <label class="f" for="fPara">E-mail(s) de destino *</label>
+        <input type="text" id="fPara" placeholder="nome@meirelesefreitas.com.br; outro@...">
+        <div class="hint" id="fParaHint">Separe vários e-mails com vírgula ou ponto e vírgula.</div>
+      </div>
+      <div class="full">
+        <label class="f" for="fCc">Cópia (CC) — opcional</label>
+        <input type="text" id="fCc" placeholder="gestor@meirelesefreitas.com.br">
+        <div class="hint" id="fCcHint"></div>
+      </div>
+      <div class="full">
+        <label class="f">Grupos da planilha que pertencem a esta área * <span style="font-weight:400">(coluna "Grupo" da aba BD · entre parênteses, tarefas não concluídas)</span></label>
+        <div class="grupos" id="fGrupos"></div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="btnSalvarArea" class="primary">Salvar área</button>
+      <button id="btnCancelarArea" class="ghost">Cancelar</button>
+      <span id="formErro" class="err" style="font-size:13px"></span>
+    </div>
+  </div>
+
+  <div class="grid" id="listaAreas"></div>
+  <div id="semArea" class="callout" hidden></div>
+</section>
+
+<!-- 2. Painel da área -->
+<section id="painel">
+  <h2 id="painelTitulo">2. Painel da área</h2>
+  <p class="sub" id="painelSub">Selecione uma área acima.</p>
+  <div id="painelCorpo" hidden>
+    <div class="row" style="margin-bottom:12px">
+      <div style="min-width:210px">
+        <label class="f" for="filtroStatus">Tarefas</label>
+        <select id="filtroStatus">
+          <option value="abertas">Não concluídas (A iniciar + Em andamento)</option>
+          <option value="atrasadas">Só atrasadas</option>
+          <option value="prox">Atrasadas + vencem em 15 dias</option>
+          <option value="todas">Todas, inclusive concluídas</option>
+        </select>
+      </div>
+      <div style="min-width:240px">
+        <label class="f" for="filtroProjeto">Projeto</label>
+        <select id="filtroProjeto"></select>
+      </div>
+      <div style="min-width:220px;flex:1">
+        <label class="f" for="filtroBusca">Buscar</label>
+        <input type="text" id="filtroBusca" placeholder="Atividade, ação ou observação">
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:10px;font-size:13px;color:var(--muted)">
+      <span id="contagem"></span>
+      <div class="spacer"></div>
+      <button class="ghost" id="btnMarcarTodas">Marcar todas</button>
+      <button class="ghost" id="btnDesmarcarTodas">Desmarcar todas</button>
+      <button class="ghost" id="btnCsv">Baixar CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th title="Incluir no e-mail">✉</th><th>Ação</th><th>Atividade a ser realizada</th><th>Início</th><th>Fim</th><th>Status</th><th>Observação</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="hint">"Ação" é o marco do projeto na aba BD (ex.: MARCO 1 · Atração, Seleção e Admissão) e "Atividade a ser realizada" é a coluna "Ação" de cada linha. A observação automática é calculada a partir do prazo, local, quantidade e SLA. O campo abaixo dela é livre, fica salvo neste navegador e vai junto no e-mail.</p>
+  </div>
+</section>
+
+<!-- 3. Envio -->
+<section id="envio">
+  <h2>3. Enviar para a área</h2>
+  <p class="sub" id="envioSub">Selecione uma área com e-mail cadastrado.</p>
+  <div class="send" id="envioCorpo" hidden>
+    <div class="opts">
+      <div>
+        <label class="f">Para</label>
+        <div id="envPara" style="font-size:13.5px;word-break:break-all"></div>
+      </div>
+      <div>
+        <label class="f" for="envAssunto">Assunto</label>
+        <input type="text" id="envAssunto">
+      </div>
+      <div>
+        <label class="f" for="envMsg">Mensagem de abertura</label>
+        <textarea id="envMsg" rows="4"></textarea>
+      </div>
+      <div class="btns">
+        <button id="btnGmail" class="primary">Abrir no Gmail<small>Rascunho pronto com destinatários e tarefas (texto)</small></button>
+        <button id="btnCopiar">Copiar e-mail formatado<small>Cola com tabela no Gmail ou Outlook</small></button>
+        <button id="btnEml">Baixar para o Outlook (.eml)<small>Abre como rascunho com a tabela formatada</small></button>
+        <button id="btnMailto" class="ghost">Abrir no app de e-mail padrão<small>Texto simples; listas longas podem ser cortadas</small></button>
+      </div>
+      <div id="envAviso" class="hint"></div>
+      <div class="hist" id="historico"></div>
+    </div>
+    <div>
+      <label class="f">Prévia do e-mail</label>
+      <div class="preview" id="preview"></div>
+    </div>
+  </div>
+  <div class="callout info" style="margin-top:18px">
+    Este painel é uma página estática (GitHub Pages): ele <b>prepara</b> o e-mail e quem envia é você, pelo Gmail ou Outlook. O cadastro de áreas e as observações ficam salvos <b>só neste navegador</b>. Para levar para outro computador ou colega, use "Exportar cadastro" e "Importar cadastro".
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Painel de Gestão de Projetos · Meireles e Freitas · tarefas da aba BD de <span id="footFonte"></span> · <a href="index.html">voltar ao painel consolidado</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="dados/tarefas-bd.js"></script>
+<script src="js/bd-parser.js"></script>
+<script src="js/envio-area.js"></script>
+</body>
+</html>
